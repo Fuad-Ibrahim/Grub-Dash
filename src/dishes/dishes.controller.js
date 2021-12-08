@@ -83,33 +83,51 @@ function create(req, res, next) {
   res.status(201).json({ data: { newDish } });
 }
 
-
 // validation for dish id
-function dishExist(req,res,next){
-    const {dishId} = req.params;
-    const { data:{id} = {}} = req.body;
-    const foundDish = dishes.find(dish=> dish.id === dishId)
-    if(dishId === undefined){
-        next({
-            status: 404,
-            message: `Dish does not exist: ${dishId}`
-        })
-    }
-    else if (id !== dishId){
-        next({
-            status: 404,
-            message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`
-        })
-    }
-    
+function dishIdExist(req, res, next) {
+  const { dishId } = req.params;
+  const { data: { id } = {} } = req.body;
+  const foundDish = dishes.find((dish) => dish.id == dishId);
+  if (dishId === undefined) {
+    next({
+      status: 404,
+      message: `Dish does not exist: ${dishId}`,
+    });
+  } else if (id !== dishId) {
+    next({
+      status: 404,
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
+    });
+  }
+  res.local.dishes = foundDish;
+  next();
 }
-// read one dish using dish id
-function(req, res, next){
-    const 
-    res.stats(200).json({data:{foundDish}})
-} 
+
+//update the deish
+function update(req, res, next) {
+  const dish = res.local.dishes;
+  const dishIndex = dishes.indexOf(dish);
+  const { data } = req.body;
+  dishes[dishIndex] = data;
+  res.status(201).json({ data: { data } });
+}
+
+// return one dish using dishId
+function read(req, res, next) {
+  const foundDish = res.local.dishesh;
+  res.stats(200).json({ data: { foundDish } });
+}
 
 module.exports = {
   list,
   create: [nameExist, descriptionCheck, priceExist, imageExist, create],
+  update: [
+    nameExist,
+    descriptionCheck,
+    priceExist,
+    imageExist,
+    dishIdExist,
+    update,
+  ],
+  read: [dishIdExist, read],
 };
