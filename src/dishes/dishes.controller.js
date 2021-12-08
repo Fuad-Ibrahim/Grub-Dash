@@ -26,7 +26,7 @@ function nameExist(req, res, next) {
   next();
 }
 
-function discriptionCheck(req, res, next) {
+function descriptionCheck(req, res, next) {
   const { description } = req.body.description;
   if (description === undefined || description.length === 0) {
     return next({
@@ -65,4 +65,51 @@ function imageExist(req, res, next) {
   next();
 }
 
-function create(req, res, next) {}
+// Create a new dish
+//Create a new Id for new dishes
+let newId = dishes.length + 1;
+function create(req, res, next) {
+  const {
+    data: { name, description, price, image_url },
+  } = req.body;
+  const newDish = {
+    newId,
+    name,
+    description,
+    price,
+    image_url,
+  };
+  dishes.push(newDish);
+  res.status(201).json({ data: { newDish } });
+}
+
+
+// validation for dish id
+function dishExist(req,res,next){
+    const {dishId} = req.params;
+    const { data:{id} = {}} = req.body;
+    const foundDish = dishes.find(dish=> dish.id === dishId)
+    if(dishId === undefined){
+        next({
+            status: 404,
+            message: `Dish does not exist: ${dishId}`
+        })
+    }
+    else if (id !== dishId){
+        next({
+            status: 404,
+            message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`
+        })
+    }
+    
+}
+// read one dish using dish id
+function(req, res, next){
+    const 
+    res.stats(200).json({data:{foundDish}})
+} 
+
+module.exports = {
+  list,
+  create: [nameExist, descriptionCheck, priceExist, imageExist, create],
+};
